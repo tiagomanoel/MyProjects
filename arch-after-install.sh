@@ -25,22 +25,20 @@ Usage: $(basename "$0") [-h | -V]
     -V      Version
 "
 # Handling of command-line options
-case $1 in
-    -h | --help)
-        echo "$USAGE_MESSAGE"
-        exit 0
-    ;;
-    -V | --version) 
-        echo $VERSION 
-        exit 0
-    ;;
-    *) if test -n "$1"
-       then
-            echo Invalid: $1
-            exit 1
-       fi    
-    ;;
-esac
+while test -n "$1"
+do
+    case $1 in
+        -h | --help     ) echo "$USAGE_MESSAGE"; exit 0 ;;
+        -V | --version  ) echo "$VERSION";       exit 0 ;;
+        *) if test -n "$1"
+            then
+                echo Invalid: $1
+                exit 1
+            fi    
+        ;;
+    esac
+shift
+done
 
 ### Functions ###
 declare -f PRIMARY_MENU         # Main Menu
