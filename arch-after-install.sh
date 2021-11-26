@@ -19,7 +19,7 @@
 #   
 # License: GPL. 
 #
-VERSION="Arch-After-Install 0.01"
+VERSION="Arch-After-Install 0.02"
 USAGE_MESSAGE="
 Usage: $(basename "$0") [-h | -V | -Y]
     
