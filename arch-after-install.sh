@@ -25,7 +25,15 @@ Usage: $(basename "$0") [-h | -V | -Y]
     
     -h      Help
     -V      Version
+    -C      Changelog
     -Y      Yay Install
+"
+CHANGELOG="
+Changelog: $(basename "$0")
+    v0.01 2021-11-26
+       - version starts (first services in operation) :)
+    v0.02 2021-11-26
+       - add softwares multilib and YAY Install
 "
 ### Functions ###
 declare -f PRIMARY_MENU         # Main Menu
@@ -309,6 +317,7 @@ do
     case $1 in
         -h | --help     ) echo "$USAGE_MESSAGE"; exit 0 ;;
         -V | --version  ) echo "$VERSION";       exit 0 ;;
+        -C | --changelog) echo "$CHANGELOG";     exit 0 ;;
         -Y | --yay      ) YAY_INSTALL                   ;;
         *) if test -n "$1"
             then
