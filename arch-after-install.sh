@@ -26,10 +26,10 @@ Usage: $0 [-h | -V]
 "
 # Handling of command-line options
 case $1 in
-    -h) echo "$USAGE_MESSAGE"
+    -h | --help) echo "$USAGE_MESSAGE"
         exit 0
     ;;
-    -V) echo "$VERSION"
+    -V | --version) echo "$VERSION"
         exit 0
     ;;
     *) if test -n "$1"
