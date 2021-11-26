@@ -14,32 +14,19 @@
 #
 #   v0.01 2021-11-26
 #       - version starts (first services in operation) :)
-#
+#   v0.02 2021-11-26
+#       - add softwares multilib and YAY Install
+#   
 # License: GPL. 
 #
 VERSION="Arch-After-Install 0.01"
 USAGE_MESSAGE="
-Usage: $(basename "$0") [-h | -V]
+Usage: $(basename "$0") [-h | -V | -Y]
     
     -h      Help
     -V      Version
+    -Y      Yay Install
 "
-# Handling of command-line options
-while test -n "$1"
-do
-    case $1 in
-        -h | --help     ) echo "$USAGE_MESSAGE"; exit 0 ;;
-        -V | --version  ) echo "$VERSION";       exit 0 ;;
-        *) if test -n "$1"
-            then
-                echo Invalid: $1
-                exit 1
-            fi    
-        ;;
-    esac
-shift
-done
-
 ### Functions ###
 declare -f PRIMARY_MENU         # Main Menu
 declare -f SYSTEM_SOFTWARES     # Sofwares Menu
@@ -49,6 +36,7 @@ declare -f FILE                 # File Tools
 declare -f MEDIA                # Media tools
 declare -f FONTS                # Fonts ttf
 declare -f VERIFY_DEPENDENCIES  # Check Dependencies
+declare -f YAY_INSTALL          # Install the Yay
 
 function VERIFY_ROOT()
 {
@@ -62,8 +50,10 @@ function VERIFY_ROOT()
 
 function VERIFY_DEPENDENCIES()
 {
+    sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf # Add Multilib
     pacman -Syyu --noconfirm
     which whiptail || pacman -S libnewt --noconfirm
+    which git || pacman -S git --noconfirm
 }
 
 function PRIMARY_MENU()
@@ -95,20 +85,28 @@ function CHOSSE_DESKTOP()
     "PLASMA" "Kde Plasma" OFF \
     3>&1 1>&2 2>&3)
     case $software in
-        GNOME)        
-            pacman -S xorg xorg-server gnome fwupd gnome-packagekit networkmanager --noconfirm 
-            systemctl enable NetworkManager
-            systemctl enable gdm.service
-            PRIMARY_MENU
+        GNOME   )  if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
+                then
+                    [ $? == 0 ] && pacman -S xorg xorg-server gnome fwupd gnome-packagekit networkmanager --noconfirm 
+                    systemctl enable NetworkManager
+                    systemctl enable gdm.service
+                    PRIMARY_MENU
+                else
+                    CHOSSE_DESKTOP
+            fi        
         ;;
-        PLASMA) 
-            pacman -S xorg plasma packagekit-qt5 packagekit-qt5 fwupd appstream networkmanager kde-applications --noconfirm
-            systemctl enable NetworkManager
-            systemctl enable sddm.service
-            PRIMARY_MENU
+        PLASMA  ) if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
+                then
+                    [ $? == 0 ] && pacman -S xorg plasma packagekit-qt5 packagekit-qt5 fwupd appstream networkmanager kde-applications --noconfirm
+                    systemctl enable NetworkManager
+                    systemctl enable sddm.service
+                    PRIMARY_MENU
+                else
+                    CHOSSE_DESKTOP
+            fi        
         ;;
-        *)
-            if [ $? == 1 ]; then PRIMARY_MENU; fi
+        *       )
+                if [ $? == 1 ]; then PRIMARY_MENU; fi
     esac
 }
 
@@ -123,7 +121,6 @@ function SYSTEM_SOFTWARES()
     "alacritty" "Terminal Emulator" OFF \
     "bash-completion" "auto complete in bash" OFF \
     "bluez bluez-utils" "Bluetooth" OFF \
-    "bash-completion" "Auto complete for Bash" OFF \
     "dosfstools mtools" "Filesystem Utility" OFF \
     "flatpak" "Sandbox on Linux" OFF \
     "fwupd" "Daemon to Update Firmware" OFF \
@@ -141,7 +138,6 @@ function SYSTEM_SOFTWARES()
     "sshfs" "FUSE-based filesystem client" OFF \
     "sudo" "ROOT for users" OFF \
     "samba" "share with windows" OFF \
-    "traker" "search tool and metadata database GNOME" OFF \
     "vulkan-tools" "Vulkan api tools" OFF \
     "lib32-vulkan-icd-loader" "lib 32 Vulkan" OFF \
     "wine" "windows compatibility layer" OFF \
@@ -152,7 +148,6 @@ function SYSTEM_SOFTWARES()
     "nvidia-utils" "Drivers" OFF \
     "opencl-nvidia" "Drivers" OFF \
     "lib32-nvidia-utils" "Drivers" OFF \
-    "Drivers Nvidia" "Drivers" OFF \
     "packagekit-qt5" "Packagekit of kde" OFF \
     "xdg-user-dirs" "User Directories" OFF \
     "zsh" "Shell" OFF \
@@ -289,6 +284,41 @@ function FONTS()
     esac
 
 }
+
+function YAY_INSTALL()
+{
+    whiptail --title "Do you want to Install Yay-git?" --yesno "Yay is a Helper, used to manage packages in AUR repositories" 10 50
+    case $? in
+        0) which yay && echo "YAY Installed" && exit 0
+            which git || sudo pacman -S git --noconfirm
+            cd /tmp
+            git clone http://aur.archlinux.org/yay-git
+            cd yay-git
+            makepkg -si
+            rm -rf /tmp/yay-git
+            exit 0
+        ;;
+            1) exit 0 
+        ;;
+    esac
+}
+
+# Handling of command-line options
+while test -n "$1"
+do
+    case $1 in
+        -h | --help     ) echo "$USAGE_MESSAGE"; exit 0 ;;
+        -V | --version  ) echo "$VERSION";       exit 0 ;;
+        -Y | --yay      ) YAY_INSTALL                   ;;
+        *) if test -n "$1"
+            then
+                echo Invalid: $1
+                exit 1
+            fi    
+        ;;
+    esac
+shift
+done
 
 # EXEC
 VERIFY_ROOT
