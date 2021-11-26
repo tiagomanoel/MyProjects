@@ -19,17 +19,19 @@
 #
 VERSION="Arch-After-Install 0.01"
 USAGE_MESSAGE="
-Usage: $0 [-h | -V]
+Usage: $(basename "$0") [-h | -V]
     
     -h      Help
     -V      Version
 "
 # Handling of command-line options
 case $1 in
-    -h | --help) echo "$USAGE_MESSAGE"
+    -h | --help)
+        echo "$USAGE_MESSAGE"
         exit 0
     ;;
-    -V | --version) echo "$VERSION"
+    -V | --version) 
+        echo $VERSION 
         exit 0
     ;;
     *) if test -n "$1"
