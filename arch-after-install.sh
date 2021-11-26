@@ -1,8 +1,44 @@
 #!/bin/bash
-
-### Variables ###
-declare MAIN_MENU # receive user information in main menu
-declare SOFTWARES # receive information from the user in the software menu
+#
+# arch-after-install.sh - Automates installation of packages after "essentials" after a base installation of Arch Linux.
+#
+# Site: ...
+# Author: Tiago G. Manoel <tiago.g.manoel@gmail.com>
+# Maintenance: Tiago G. Manoel <tiago.g.manoel@gmail.com>
+#
+# -----------------------------------------------------------------------------------------------------------------------
+# This program automates the installation of "essential" software on the Arch Linux system after a base installation of it.
+# Example: Graphic interfaces, network services, multimedia programs, office and etc...
+#
+# History:
+#
+#   v0.01 2021-11-26
+#       - version starts (first services in operation) :)
+#
+# License: GPL. 
+#
+VERSION="Arch-After-Install 0.01"
+USAGE_MESSAGE="
+Usage: $0 [-h | -V]
+    
+    -h      Help
+    -V      Version
+"
+# Handling of command-line options
+case $1 in
+    -h) echo "$USAGE_MESSAGE"
+        exit 0
+    ;;
+    -V) echo "$VERSION"
+        exit 0
+    ;;
+    *) if test -n "$1"
+       then
+            echo Invalid: $1
+            exit 1
+       fi    
+    ;;
+esac
 
 ### Functions ###
 declare -f PRIMARY_MENU         # Main Menu
@@ -12,25 +48,29 @@ declare -f CHOSSE_DESKTOP       # Desktop Environment Menu
 declare -f FILE                 # File Tools
 declare -f MEDIA                # Media tools
 declare -f FONTS                # Fonts ttf
+declare -f VERIFY_DEPENDENCIES  # Check Dependencies
 
-### make sure this is run as root ###
 function VERIFY_ROOT()
 {
-	uid=$(id -ur)
-	if [ "$uid" != "0" ]; then
-	        echo "ERROR: This script must be run as root."
-		if [ -x /usr/bin/sudo ]; then
-			echo "try: sudo $0"
-		fi
-	        exit 1
-	fi
+    if [ "$(id -nu)" != "root" ]; then
+        sudo -k
+        pass=$(whiptail --backtitle "Installer" --title "Authentication required" --passwordbox "Installing requires administrative privilege. Please authenticate to begin the installation.\n\n[sudo] Password for user $USER:" 12 50 3>&2 2>&1 1>&3-)
+        exec sudo -S -p '' "$0" "$@" <<< "$pass"
+        exit 1
+    fi
 }
 
-### PRIMARY MENU ###
+function VERIFY_DEPENDENCIES()
+{
+    pacman -Syyu --noconfirm
+    which whiptail || pacman -S libnewt --noconfirm
+}
+
 function PRIMARY_MENU()
 {
-    MAIN_MENU=$(whiptail --title "What do you want to install" --radiolist \
-    "Use Space to select and TAB to navigate" 15 80 5 \
+    declare main_menu # receive user information in main menu
+    main_menu=$(whiptail --title "What do you want to install" --radiolist \
+    "Use Space to select and TAB to navigate" 15 55 5 \
     "CHOSSE_DESKTOP" "Desktop Environment Menu" OFF \
     "SYSTEM_SOFTWARES" "Softwares of System" OFF \
     "FILE" "Compactors" OFF \
@@ -38,7 +78,7 @@ function PRIMARY_MENU()
     "FONTS" "Text Fonts" OFF \
     3>&1 1>&2 2>&3)
     case $? in # Receive the function to be called
-        0) if [ MAIN_MENU != 0 ]; then $MAIN_MENU; else exit 0; fi
+        0) if [ main_menu != 0 ]; then $main_menu; else exit 0; fi
         ;;
         1) exit 0
         ;;
@@ -46,24 +86,26 @@ function PRIMARY_MENU()
 
 }
 
-# Choose your Ambient Graphic
 function CHOSSE_DESKTOP()
 {
-    SOFTWARES=$(whiptail --title "Make for Installed" --checklist --separate-output \
-    "Use the Key 'SPACE' for selection!" --ok-button "INSTALL" --cancel-button "VOLTAR" 15 60 4 \
+    declare software # receive information from the user in the software menu
+    software=$(whiptail --title "Make for Installed" --checklist --separate-output \
+    "Use the Key 'SPACE' for selection!" --ok-button "INSTALL" --cancel-button "VOLTAR" 10 35 4 \
     "GNOME" "Ambient Gnome" OFF \
     "PLASMA" "Kde Plasma" OFF \
     3>&1 1>&2 2>&3)
-    case $SOFTWARES in
+    case $software in
         GNOME)        
-            pacman -S xorg xorg-server gnome fwupd gnome-packagekit networkmanager #--nocomfirm 
+            pacman -S xorg xorg-server gnome fwupd gnome-packagekit networkmanager --noconfirm 
             systemctl enable NetworkManager
-            systemctl enable gdm.srvice
+            systemctl enable gdm.service
+            PRIMARY_MENU
         ;;
-        PLASMA) echo plasma
-            pacman -S xorg plasma packagekit-qt5 packagekit-qt5 fwupd appstream networkmanager #--nocomfirm
+        PLASMA) 
+            pacman -S xorg plasma packagekit-qt5 packagekit-qt5 fwupd appstream networkmanager kde-applications --noconfirm
             systemctl enable NetworkManager
             systemctl enable sddm.service
+            PRIMARY_MENU
         ;;
         *)
             if [ $? == 1 ]; then PRIMARY_MENU; fi
@@ -72,7 +114,8 @@ function CHOSSE_DESKTOP()
 
 function SYSTEM_SOFTWARES()
 {
-    SOFTWARES=$(whiptail --title "Make for Installed" --checklist --separate-output \
+    declare software # receive information from the user in the software menu
+    software=$(whiptail --title "Make for Installed" --checklist --separate-output \
     "Use the Key 'SPACE' for selection!" --ok-button "INSTALL" --cancel-button "VOLTAR" 30 75 20 \
     "acpi" "Hardware Information" OFF \
     "acpid" "Hardware Information" OFF \
@@ -85,7 +128,6 @@ function SYSTEM_SOFTWARES()
     "flatpak" "Sandbox on Linux" OFF \
     "fwupd" "Daemon to Update Firmware" OFF \
     "git" "Gihub" OFF \
-    "neofetch" "System Info" OFF \
     "reflector" "Mirros  search" OFF \
     "wget" "Download Manager" OFF \
     "iwd" "Wifi CLI" OFF \
@@ -120,7 +162,12 @@ function SYSTEM_SOFTWARES()
     "pipewire-pulse" "Sound for linux" OFF \
     3>&1 1>&2 2>&3)
     case $? in
-        0) pacman -S $SOFTWARES
+        0) if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
+                then
+                [ $? == 0 ] && pacman -S $software --noconfirm; PRIMARY_MENU
+                else
+                SYSTEM_SOFTWARES
+            fi  
         ;;
         1) PRIMARY_MENU 
         ;;
@@ -132,12 +179,18 @@ function SYSTEM_SOFTWARES()
 
 function FILE()
 {
-    SOFTWARES=$(whiptail --title "Make for Installed" --checklist --separate-output \
+    declare software # receive information from the user in the software menu
+    software=$(whiptail --title "Make for Installed" --checklist --separate-output \
     "Use the Key 'SPACE' for selection!" --ok-button "INSTALL" --cancel-button "VOLTAR" 30 75 20 \
     "gzip unrar p7zip" "file archiver" OFF \
     3>&1 1>&2 2>&3)
     case $? in
-        0) pacman -S $SOFTWARES
+        0) if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
+                then
+                [ $? == 0 ] && pacman -S $software --noconfirm; PRIMARY_MENU
+                else
+                FONTS
+            fi  
         ;;
         1) PRIMARY_MENU 
         ;;
@@ -149,7 +202,8 @@ function FILE()
 
 function MEDIA()
 {
-    SOFTWARES=$(whiptail --title "Make for Installed" --checklist --separate-output \
+    declare software # receive information from the user in the software menu
+    software=$(whiptail --title "Make for Installed" --checklist --separate-output \
     "Use the Key 'SPACE' for selection!" --ok-button "INSTALL" --cancel-button "VOLTAR" 30 75 20 \
     "mpv" "Media Player" OFF \
     "vlc" "Media Player" OFF \
@@ -158,7 +212,12 @@ function MEDIA()
     "emby-server" "Personal media server" OFF \
     3>&1 1>&2 2>&3)
     case $? in
-        0) pacman -S $SOFTWARES
+        0) if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
+                then
+                [ $? == 0 ] && pacman -S $software --noconfirm; PRIMARY_MENU
+                else
+                MEDIA
+            fi  
         ;;
         1) PRIMARY_MENU 
         ;;
@@ -170,8 +229,9 @@ function MEDIA()
 
 function FONTS()
 {
-    SOFTWARES=$(whiptail --title "Make for Installed" --checklist --separate-output \
-    "Use the Key 'SPACE' for selection!" --ok-button "INSTALL" --cancel-button "VOLTAR" 30 75 20 \
+    declare software # receive information from the user in the software menu
+    software=$(whiptail --title "Make for Installed" --checklist --separate-output \
+    "Use the Key 'SPACE' for selection!" --ok-button "INSTALL" --cancel-button "VOLTAR" 30 40 20 \
     "ttc-iosevka" "" OFF \
     "ttf-anonymous-pro" "" OFF \
     "ttf-arphic-ukai" "" OFF \
@@ -215,7 +275,12 @@ function FONTS()
     "ttf-ubuntu-font-family" "" OFF \
     3>&1 1>&2 2>&3)
     case $? in
-        0) pacman -S $SOFTWARES
+        0) if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
+                then
+                [ $? == 0 ] && pacman -S $software --noconfirm; PRIMARY_MENU
+                else
+                FONTS
+            fi  
         ;;
         1) PRIMARY_MENU 
         ;;
@@ -227,5 +292,7 @@ function FONTS()
 
 # EXEC
 VERIFY_ROOT
+VERIFY_DEPENDENCIES
 PRIMARY_MENU
+
 
