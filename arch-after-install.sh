@@ -87,7 +87,7 @@ function PRIMARY_MENU()
 function CHOSSE_DESKTOP()
 {
     declare software # receive information from the user in the software menu
-    software=$(whiptail --title "Make for Installed" --checklist --separate-output \
+    software=$(whiptail --title "Make for Installed" --radiolist \
     "Use the Key 'SPACE' for selection!" --ok-button "INSTALL" --cancel-button "VOLTAR" 10 35 4 \
     "GNOME" "Ambient Gnome" OFF \
     "PLASMA" "Kde Plasma" OFF \
