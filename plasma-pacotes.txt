@@ -1,3 +1,5 @@
 minimal
-plasma dolphin konsole  
+plasma dolphin konsole avahi  
 
+remove
+plasma-sdk discovery
