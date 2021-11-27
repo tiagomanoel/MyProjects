@@ -95,9 +95,13 @@ function CHOSSE_DESKTOP()
     case $software in
         GNOME   )  if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
                 then
-                    [ $? == 0 ] && pacman -S xorg xorg-server gnome fwupd gnome-packagekit networkmanager --noconfirm 
+                    [ $? == 0 ] && pacman -S xorg xorg-server gnome fwupd gnome-packagekit networkmanager avahi bluez openssh gnome-software-packagekit-plugin \
+                    archlinux-appstream-data --noconfirm 
                     systemctl enable NetworkManager
                     systemctl enable gdm.service
+                    systemctl enable avahi
+                    systemctl enable sshd
+                    systemctl enable bluetooth
                     PRIMARY_MENU
                 else
                     CHOSSE_DESKTOP
@@ -105,9 +109,13 @@ function CHOSSE_DESKTOP()
         ;;
         PLASMA  ) if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
                 then
-                    [ $? == 0 ] && pacman -S xorg plasma packagekit-qt5 packagekit-qt5 fwupd appstream networkmanager kde-applications --noconfirm
+                    [ $? == 0 ] && pacman -S xorg plasma dolphin konsole packagekit-qt5 archlinux-appstream-data fwupd networkmanager avahi bluez mtpfs \
+                    sshfs openssh kdeconnect --noconfirm
                     systemctl enable NetworkManager
+                    systemctl enable bluetooth
+                    systemctl enable sshd
                     systemctl enable sddm.service
+                    systemctl enable avahi
                     PRIMARY_MENU
                 else
                     CHOSSE_DESKTOP
