@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+name=$(whiptail --title "Add User" --inputbox "enter the username:" 10 60 3>&1 1>&2 2>&3)
+
+ if [ $? == 0 ]; then
+    echo "escolha os grupos"
+    op1="-m"
+    op2="-G"
+    g1="wheel"
+    g2="storage"
+    g3="power"
+    g4="sudo"
+
+    useradd "$op1" "$op2" "$g1" "$g2" "$g3" "$name"
+    
+    #sudo passwd "$name"
+
+    
+
+else
+    echo "cancel"
+fi        
