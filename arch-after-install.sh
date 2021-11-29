@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # arch-after-install.sh - Automates installation of packages after "essentials" after a base installation of Arch Linux.
 #
@@ -67,13 +67,13 @@ function VERIFY_DEPENDENCIES()
 function PRIMARY_MENU()
 {
     declare main_menu # receive user information in main menu
-    main_menu=$(whiptail --title "What do you want to install" --radiolist \
+    main_menu=$(whiptail --title "What do you want to install" --menu \
     "Use Space to select and TAB to navigate" 15 55 5 \
-    "CHOSSE_DESKTOP" "Desktop Environment Menu" OFF \
-    "SYSTEM_SOFTWARES" "Softwares of System" OFF \
-    "FILE" "Compactors" OFF \
-    "MEDIA" "Codecs and Players" OFF \
-    "FONTS" "Text Fonts" OFF \
+    "CHOSSE_DESKTOP" "Desktop Environment" \
+    "SYSTEM_SOFTWARES" "Sofwares Menu"\
+    "FILE" "File Tools" \
+    "MEDIA" "Media tools and Plyers"\
+    "FONTS" "Fonts ttf" \
     3>&1 1>&2 2>&3)
     case $? in # Receive the function to be called
         0) if [ main_menu != 0 ]; then $main_menu; else exit 0; fi
@@ -87,10 +87,10 @@ function PRIMARY_MENU()
 function CHOSSE_DESKTOP()
 {
     declare software # receive information from the user in the software menu
-    software=$(whiptail --title "Make for Installed" --radiolist \
+    software=$(whiptail --title "Make for Installed" --menu \
     "Use the Key 'SPACE' for selection!" --ok-button "INSTALL" --cancel-button "VOLTAR" 10 35 4 \
-    "GNOME" "Ambient Gnome" OFF \
-    "PLASMA" "Kde Plasma" OFF \
+    "GNOME" "Ambient Gnome" \
+    "PLASMA" "Kde Plasma" \
     3>&1 1>&2 2>&3)
     case $software in
         GNOME   )  if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
