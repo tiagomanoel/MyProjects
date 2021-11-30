@@ -118,6 +118,7 @@ function CHOSSE_DESKTOP()
                     systemctl enable avahi
                     systemctl enable sshd
                     systemctl enable bluetooth
+                    systemctl enable acpid
                     PRIMARY_MENU
                 else
                     CHOSSE_DESKTOP
@@ -132,6 +133,7 @@ function CHOSSE_DESKTOP()
                     systemctl enable sshd
                     systemctl enable sddm.service
                     systemctl enable avahi
+                    systemctl enable acpid
                     PRIMARY_MENU
                 else
                     CHOSSE_DESKTOP
