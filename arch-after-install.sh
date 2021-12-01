@@ -97,7 +97,6 @@ function PRIMARY_MENU()
         1) exit 0
         ;;
     esac
-
 }
 
 function CHOSSE_DESKTOP()
@@ -203,7 +202,6 @@ function SYSTEM_SOFTWARES()
         *) exit 0
         ;;
     esac
-
 }
 
 function FILE()
@@ -226,7 +224,6 @@ function FILE()
         *) exit 0
         ;;
     esac
-
 }
 
 function MEDIA()
@@ -253,7 +250,6 @@ function MEDIA()
         *) exit 0
         ;;
     esac
-
 }
 
 function FONTS()
@@ -316,7 +312,6 @@ function FONTS()
         *) exit 0
         ;;
     esac
-
 }
 
 function YAY_INSTALL()
