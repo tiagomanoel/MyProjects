@@ -20,7 +20,7 @@ function I3-GAPS()
         #sed -i '/exec/,/twm/ s/^/#/' ~/.xinitrc
         xdg-user-dirs-update
         echo "exec i3" >> ~/.xinitrc
-        autostart="if [[ -z \\$DISPLAY ]] && [[ \$(tty) = /dev/tty1 ]]; then
+        autostart="if [[ -z \$DISPLAY ]] && [[ \$(tty) = /dev/tty1 ]]; then
             exec startx
         fi"
         echo "$autostart" >> ~/.bashrc
