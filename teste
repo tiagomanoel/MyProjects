@@ -9,7 +9,7 @@ function I3-GAPS()
 
     function Install_Softwares()
     {
-        sudo pacman -S i3-gaps i3status dmenu ttf-dejavu xorg xorg-xinit xterm pipewire pipewire-alsa pipewire-pulse pipewire-jack pavucontrol \
+        sudo pacman -S i3-gaps i3status dmenu ttf-dejavu xorg xorg-xinit xfce4-terminal lolcat pipewire pipewire-alsa pipewire-pulse pipewire-jack pavucontrol \
         zsh wget ranger lynx avahi bluez bluez-utils openssh acpi acpid lxappearance arandr xdg-user-dirs feh gvfs gvfs-mtp gvfs-nfs gvfs-smb \
         thunar thunar-archive-plugin thunar-volman wget gedit picom --noconfirm
     }
