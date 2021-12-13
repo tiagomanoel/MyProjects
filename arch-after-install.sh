@@ -188,6 +188,7 @@ function SYSTEM_SOFTWARES()
     "pipewire-alsa" "Sound for linux" OFF \
     "pipewire-jack" "Sound for linux" OFF \
     "pipewire-pulse" "Sound for linux" OFF \
+    "lsb-release" "System Information" OFF \
     3>&1 1>&2 2>&3)
     case $? in
         0) if whiptail --title "Do you want to Install?" --yesno "$software" --scrolltext 10 50
