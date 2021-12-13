@@ -202,11 +202,9 @@ function I3-GAPS()
                     bindsym Escape mode \"default\"
                     bindsym \$mod+r mode \"default\"
             }
-
-            bindsym \$mod+r mode \"resize\"
-
+            
             ###I3-Gaps###
-            for_window [class=^.\*\"\] border pixel 3
+            for_window [class=^.*\"] border pixel 3
             gaps inner 5
             gaps outer 5
 
@@ -224,7 +222,7 @@ function I3-GAPS()
             bar {
                     status_command i3status
 	        }
-	        exec picom \&
+	        exec picom &
             exec --no-startup-id feh --bg-fill ~/.wallpapers/wallpaper01.jpg"
         
         mkdir ~/.config/i3
