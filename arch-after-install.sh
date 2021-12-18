@@ -391,7 +391,7 @@ function CHOSSE_DESKTOP()
                                 exec picom &
                                 exec --no-startup-id feh --bg-fill ~/.wallpapers/wallpaper01.jpg"
                             
-                            mkdir /home/"$user_comum"/.config/i3
+                            mkdir -p /home/"$user_comum"/.config/i3
                             mkdir /home/"$user_comum"/.wallpapers
                             echo "$i3config" > /home/"$user_comum"/.config/i3/config
                             wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1GmPAqSNBAkIjfv8ry8IgrT-ulTPlVVi_' -O /home/$user_comum/.wallpapers/wallpaper01.jpg  
