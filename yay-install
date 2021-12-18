@@ -7,7 +7,7 @@ case $? in
       cd /tmp
       git clone http://aur.archlinux.org/yay-git
       cd yay-git
-      makepkg -si
+      makepkg -si --noconfirm
       rm -rf /tmp/yay-git
       exit 0
    ;;

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-declare -f I3-GAPS
-function I3-GAPS()
+declare -f I3_GAPS
+function I3_GAPS()
 {
     #Functions#
     declare -f Install_Softwares
@@ -245,4 +245,4 @@ function I3-GAPS()
     Configure_Ambient
     Enable_Services
 }
-I3-GAPS  
+I3_GAPS  

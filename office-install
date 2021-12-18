@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+declare -f OFFICE-INSTALL
+OFFICE-INSTALL()
+{
+    declare -f MENU
+    function MENU()
+    {
+        MENU=$(whiptail --title "What do you want to install" --menu \
+        "Use Space to select and TAB to navigate" 15 55 5 \
+        "Libre-Office" "" \
+        "Only-Office" "" \
+        3>&1 1>&2 2>&3)
+        case $? in # Receive the function to be called
+            0) if [ MENU != 0 ]
+                    then
+                        case "$MENU" in
+                            Libre-Office) pacman -S libreoffice-fresh libreoffice-fresh-pt-br --noconfirm ;;
+                            Only-Office) yay -S onlyoffice-bin --noconfirm ;;
+                                    *) exit 0 ;;
+                        esac
+                fi
+            ;;    
+            1) exit 0
+            ;;
+        esac
+    }
+    MENU
+}
+
+OFFICE-INSTALL
