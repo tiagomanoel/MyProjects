@@ -639,7 +639,9 @@ function OFFICE_INSTALL()
     function INSTALL()
     {    
             case $MENU in # Receive the function to be called
-                Libre-Office) pacman -S libreoffice-fresh libreoffice-fresh-pt-br --noconfirm ;;    
+                Libre-Office) pacman -S libreoffice-fresh libreoffice-fresh-pt-br --noconfirm
+                PRIMARY_MENU
+                ;;    
             esac
     }
     MENU
